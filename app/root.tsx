@@ -1,19 +1,32 @@
 import {
   Form,
+  Link,
   Links,
   Meta,
+  Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
+import { json } from "@remix-run/node";
+
 import appStylesHref from "./app.css?url";
+import { getContacts } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ];
 
-export default function App() {
+export const loader = async () => {
+  const contacts = await getContacts();
+  return json({ contacts });
+};
+
+const App = () => {
+  const { contacts } = useLoaderData<typeof loader>()
+
   return (
     <html lang="ja">
       <head>
@@ -41,15 +54,34 @@ export default function App() {
             </Form>
           </div>
           <nav>
-            <ul>
-              <li>
-                <a href={`/contacts/1`}>Your Name</a>
-              </li>
-              <li>
-                <a href={`/contacts/2`}>Your Friend</a>
-              </li>
-            </ul>
+            {contacts.length ? (
+                <ul>
+                  {contacts.map((contact) => (
+                    <li key={contact.id}>
+                      <Link to={`contacts/${contact.id}`}>
+                        {contact.first || contact.last ? (
+                          <>
+                            {contact.first} {contact.last}
+                          </>
+                        ) : (
+                          <i>No Name</i>
+                        )}{" "}
+                        {contact.favorite ? (
+                          <span>★</span>
+                        ) : null}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  <i>No contacts</i>
+                </p>
+              )}
           </nav>
+        </div>
+        <div id="detail">
+            <Outlet />
         </div>
 
         <ScrollRestoration />
@@ -58,3 +90,5 @@ export default function App() {
     </html>
   );
 }
+
+export default App;
