@@ -13,13 +13,14 @@ import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import appStylesHref from "./app.css?url";
-import { getContacts } from "./data";
+import { createEmptyContact, getContacts } from "./data";
 import invariant from "tiny-invariant";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ];
 
+// NOTE: exportしないとUI上に表示されない
 export const loader = async ({params}: LoaderFunctionArgs) => {
   invariant(params.contactId, "Missing contactId param");
 
@@ -30,6 +31,11 @@ export const loader = async ({params}: LoaderFunctionArgs) => {
   }
 
   return json({ contacts });
+};
+
+export const action = async () => {
+  const contact = await createEmptyContact();
+  return json({ contact });
 };
 
 const App = () => {
