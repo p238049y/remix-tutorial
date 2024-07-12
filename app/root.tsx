@@ -8,19 +8,27 @@ import {
   ScrollRestoration,
   useLoaderData
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 
 import appStylesHref from "./app.css?url";
 import { getContacts } from "./data";
+import invariant from "tiny-invariant";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ];
 
-export const loader = async () => {
-  const contacts = await getContacts();
+export const loader = async ({params}: LoaderFunctionArgs) => {
+  invariant(params.contactId, "Missing contactId param");
+
+  const contacts = await getContacts(params.contactId);
+
+  if (!contacts) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
   return json({ contacts });
 };
 
