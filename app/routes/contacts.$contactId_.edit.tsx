@@ -1,5 +1,5 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/react";
+import { redirect, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { updateContact } from "~/data";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -33,6 +33,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 const EditContact = () => {
   const { contact } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
 
   return (
     <Form key={contact.id} id="contact-form" method="post">
@@ -82,7 +83,7 @@ const EditContact = () => {
       </label>
       <p>
         <button type="submit">Save</button>
-        <button type="button">Cancel</button>
+        <button onClick={() => navigate(-1)} type="button">Cancel</button>
       </p>
     </Form>
   );
