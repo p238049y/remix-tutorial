@@ -45,6 +45,12 @@ const App = () => {
   const navigation = useNavigation();
   const [query, setQuery] = useState(q || "");
   const submit = useSubmit();
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      "q"
+    );
+
 
   useEffect(() => {
     setQuery(q || "");
@@ -71,6 +77,7 @@ const App = () => {
             >
               <input
                 aria-label="Search contacts"
+                className={searching ? "loading" : ""}
                 id="q"
                 name="q"
                 onChange={(event) =>
@@ -80,7 +87,7 @@ const App = () => {
                 type="search"
                 value={query}
               />
-              <div id="search-spinner" aria-hidden hidden={true} />
+              <div id="search-spinner" aria-hidden hidden={!searching} />
             </Form>
             <Form method="post">
               <button type="submit">New</button>
